@@ -55,9 +55,7 @@ def create_JWT(username, secret, authz):
     )
 
 
-server.route('/validate', methods=['POST'])
-
-
+@server.route('/validate', methods=['POST'])
 def validate():
     encoded_jwt = request.headers['Authorization']
 

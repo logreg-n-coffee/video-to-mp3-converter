@@ -12,7 +12,7 @@ server.config["MYSQL_HOST"] = os.environ.get("MYSQL_HOST")
 server.config["MYSQL_USER"] = os.environ.get("MYSQL_USER")
 server.config["MYSQL_PASSWORD"] = os.environ.get("MYSQL_PASSWORD")
 server.config["MYSQL_DB"] = os.environ.get("MYSQL_DB")
-server.config["MYSQL_PORT"] = os.environ.get("MYSQL_PORT")
+server.config["MYSQL_PORT"] = os.environ.get("MYSQL_PORT")  # type:int
 
 
 # endpoints
@@ -24,9 +24,9 @@ def login():
 
     # check db for username and password
     cur = mysql.connection.cursor()
-    res = cur.execute(
-        'SELECT email, password FROM user WHERE email=%s', (auth.username)
-    )
+    query = 'SELECT email, password FROM user WHERE email= "{}"'.format(
+        auth.username)
+    res = cur.execute(query)
 
     if res > 0:
         user_row = cur.fetchone()
@@ -51,7 +51,7 @@ def create_JWT(username, secret, authz):
             'admin': authz,
         },
         secret,
-        algorithm=['HS256'],
+        algorithm='HS256',  # algorithm: str | None = 'HS256'
     )
 
 
@@ -66,7 +66,9 @@ def validate():
 
     try:
         decoded = jwt.decode(
-            encoded_jwt, os.environ.get('JWT_SECRET'), algorithm=['HS256']
+            encoded_jwt,
+            os.environ.get('JWT_SECRET'),
+            algorithms=['HS256'],  # algorithms: List[str]
         )
     except:
         return 'not authorized', 403

@@ -7,6 +7,7 @@ def upload(f, fs, channel, access):
         # put a file into the mongodb
         fid = fs.put(f)
     except Exception as err:
+        print(err)
         return "internal server error", 500
 
     message = {
@@ -26,7 +27,8 @@ def upload(f, fs, channel, access):
             ),
         )
 
-    except:
+    except Exception as err:
+        print(err)
         # if there is no message received remove the file
         fs.delete(fid)
         return "internal server error", 500

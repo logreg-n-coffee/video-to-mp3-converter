@@ -2,21 +2,29 @@ import os
 import gridfs
 import pika
 import json
-from flask import Flask, request
+from flask import Flask, request, send_file
 from flask_pymongo import PyMongo
+from bson.objectid import ObjectId
 
 # internal modules
 from auth import validate
 from auth_svc import access
 from storage import util
 
+# instantiate the server
 server = Flask(__name__)
-server.config["MONGO_URI"] = "mongodb://host.minikube.internal:27017/videos"
 
-mongo = PyMongo(server)
+# connect server with mongo - specify the dbs to connect to
+mongo_video = PyMongo(
+    server, uri="mongodb://host.minikube.internal:27017/videos")
 
-fs = gridfs.GridFS(mongo.db)
+mongo_mp3 = PyMongo(
+    server, uri="mongodb://host.minikube.internal:27017/mp3s")
 
+fs_videos = gridfs.GridFS(mongo_video.db)
+fs_mp3s = gridfs.GridFS(mongo_mp3.db)
+
+# connect with rabbitmq
 connection = pika.BlockingConnection(pika.ConnectionParameters("rabbitmq"))
 channel = connection.channel()
 
@@ -36,6 +44,9 @@ def upload():
     # first validate token the user possesses
     access, err = validate.token(request)
 
+    if err:
+        return err
+
     # decode the json to python object
     access = json.loads(access)
 
@@ -45,7 +56,7 @@ def upload():
             return "exactly 1 file required", 400
 
         for _, f in request.files.items():
-            err = util.upload(f, fs, channel, access)
+            err = util.upload(f, fs_videos, channel, access)
 
             if err:
                 return err
@@ -59,7 +70,27 @@ def upload():
 
 @server.route("/download", methods=["GET"])
 def download():
-    pass
+    access, err = validate.token(request)
+
+    if err:
+        return err
+
+    access = json.loads(access)
+
+    if access["admin"]:
+        fid_string = request.args.get("fid")
+
+        if not fid_string:
+            return "fid is required", 400
+
+        try:
+            out = fs_mp3s.get(ObjectId(fid_string))
+            return send_file(out, download_name=f"{fid_string}.mp3")
+        except Exception as err:
+            print(err)
+            return "internal server error", 500
+
+    return "not authorized", 401
 
 
 if __name__ == "__main__":

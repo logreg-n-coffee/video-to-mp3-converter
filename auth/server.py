@@ -62,12 +62,13 @@ def validate():
     if not encoded_jwt:
         return 'missing credentials', 401
 
+    # encoded_jwt follows the format 'Bearer TOKEN', split to get the token
     encoded_jwt = encoded_jwt.split(' ')[1]
 
     try:
         decoded = jwt.decode(
             encoded_jwt,
-            os.environ.get('JWT_SECRET'),
+            os.environ.get('JWT_PASSWORD'),
             algorithms=['HS256'],  # algorithms: List[str]
         )
     except:

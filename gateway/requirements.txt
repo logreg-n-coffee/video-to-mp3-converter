@@ -14,4 +14,4 @@ pycodestyle==2.10.0
 pymongo==4.6.3
 requests==2.32.4
 urllib3==2.6.3
-Werkzeug==3.1.4
+Werkzeug==3.1.6

@@ -22,7 +22,7 @@ parso==0.8.3
 platformdirs==2.6.0
 pycodestyle==2.10.0
 pycparser==2.21
-PyJWT==2.6.0
+PyJWT==2.13.0
 pylint==2.15.8
 requests==2.33.0
 tomli==2.0.1

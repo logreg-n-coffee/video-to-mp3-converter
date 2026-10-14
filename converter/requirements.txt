@@ -21,9 +21,9 @@ platformdirs==3.0.0
 proglog==0.1.10
 pycodestyle==2.10.0
 pylint==2.16.1
-pymongo==4.6.3
+pymongo==4.18.2
 requests==2.33.0
 tomlkit==0.11.6
 tqdm==4.66.3
-urllib3==2.7.0
+urllib3==2.8.0
 wrapt==1.14.1

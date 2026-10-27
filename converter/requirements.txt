@@ -1,6 +1,6 @@
 astroid==2.14.1
 autopep8==2.0.1
-certifi==2024.7.4
+certifi==2026.10.18
 charset-normalizer==3.0.1
 decorator==4.4.2
 dill==0.3.6
